@@ -1,0 +1,30 @@
+version: "3.8"
+
+services:
+  web:
+    # Use the Dockerfile in the current directory to build the image
+    build: .
+    # Map the container port 3000 to the host machine port 5000
+    ports:
+      - "80:3000"
+    # Override the Gunicorn command for development, allowing Flask's debug mode
+    # NOTE: This assumes 'app.py' has 'if __name__ == "__main__": app.run(debug=True)'
+    # environment:
+    #   FLASK_ENV: development
+    environment:
+      DB_HOST: db
+      DB_USER: user
+      DB_PASS: password
+      DB_NAME: cruddb
+      DB_PORT: 5432
+    command: python app.py
+  db:
+    image: postgres:15-alpine # Or mysql, etc.
+    environment:
+      POSTGRES_DB: cruddb
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5432:5432" # Optional: to access from host machine
+    volumes:
+      - ./postgres_data:/var/lib/postgresql/data/
